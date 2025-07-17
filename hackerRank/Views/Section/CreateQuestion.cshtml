@@ -1,0 +1,135 @@
+@model HackerRank.Models.QuestionModel 
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Create New Question</h3>
+                    <form asp-action="CreateQuestion" enctype="multipart/form-data" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="SectionId" />
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Question Text</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" required></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Question Image (Optional)</label>
+                            <input type="file" name="questionImage" class="form-control" accept="image/*" />
+                            <input type="hidden" asp-for="HasImage" value="false" />
+                            <input type="hidden" asp-for="ImageUrl" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="AnswerControlType" class="form-label">Answer Type</label>
+                            <select asp-for="AnswerControlType" class="form-select" required>
+                                <option value="">Select Answer Type</option>
+                                <option value="Radio">Single Choice (Radio)</option>
+                                <option value="Checkbox">Multiple Choice (Checkbox)</option>
+                            </select>
+                            <span asp-validation-for="AnswerControlType" class="text-danger"></span>
+                        </div>
+
+                        <div class="options-container">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                var optionTextName = $"Option{i}Text";
+                                var isOptionImageName = $"IsOption{i}Image";
+                                
+                                <div class="option-group mb-4">
+                                    <h5>Option @i</h5>
+                                    <div class="mb-2">
+                                        <label class="form-label">Text</label>
+                                        <input type="text" name="@optionTextName" class="form-control" required />
+                                        <span asp-validation-for="@optionTextName" class="text-danger"></span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Image (Optional)</label>
+                                        <input type="file" name="optionImages" class="form-control" accept="image/*" />
+                                        <input type="hidden" name="@isOptionImageName" value="false" />
+                                        <div class="img-preview mt-2" style="display: none;"></div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="CorrectOption" class="form-label">Correct Option Number</label>
+                            <input asp-for="CorrectOption" class="form-control" type="number" min="1" max="5" required />
+                            <span asp-validation-for="CorrectOption" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Create Question</button>
+                            <a asp-action="Details" asp-route-id="@Model.SectionId" class="btn btn-outline-secondary">Back to Section</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Preview image when selected
+        function previewImage(input, previewElement) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    previewElement.src = e.target.result;
+                    previewElement.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Initialize file input handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            const questionImageInput = document.querySelector('input[name="questionImage"]');
+            const optionImageInputs = document.querySelectorAll('input[name^="optionImages["]');
+
+            if (questionImageInput) {
+                const preview = document.createElement('img');
+                preview.className = 'img-preview mt-2 img-fluid';
+                preview.style.display = 'none';
+                questionImageInput.parentNode.appendChild(preview);
+
+                questionImageInput.addEventListener('change', function() {
+                    previewImage(this, preview);
+                    document.querySelector('input[name="HasImage"]').value = 'true';
+                });
+            }
+
+            optionImageInputs.forEach((input, index) => {
+                const preview = document.createElement('img');
+                preview.className = 'img-preview mt-2 img-fluid';
+                preview.style.display = 'none';
+                input.parentNode.appendChild(preview);
+
+                input.addEventListener('change', function() {
+                    previewImage(this, preview);
+                    const optionNumber = index + 1;
+                    document.querySelector(`input[name="IsOption${optionNumber}Image"]`).value = 'true';
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .img-preview {
+            max-height: 200px;
+            margin-top: 10px;
+        }
+        .option-group {
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+        }
+    </style>
+}

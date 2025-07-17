@@ -1,0 +1,279 @@
+﻿@using System.Text.Json
+@model List<HackerRank.Models.SectionModel>;
+<h1>Select Questions--</h1>
+@{
+    ViewData["Title"] = "Sections and Questions";
+    var sections = Model ;
+    var tid = ViewBag.TestId;
+}
+
+<style>
+
+    html, body {
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto;
+    }
+
+    .container {
+    padding-bottom: 120px; /* extra room for submit button and footer */
+    }
+
+
+    #submit-wrapper {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ccc;
+    text-align: right;
+    }
+
+    .nav-tabs .nav-link.active {
+    background-color: #0d6efd;
+    color: white;
+    font-weight: bold;
+    border-color: #0d6efd #0d6efd #fff;
+    }
+
+    .nav-tabs .nav-link {
+    color: #0d6efd;
+    }
+
+    .submit-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    }
+
+    .list-group-item:active{
+    background-color: #f8f9fa;
+    cursor: pointer;
+    }
+
+    .card-title {
+    color: #0d6efd;
+    font-weight: bold;
+    }
+    .question-btn:active{
+    color : blue;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 mb-3">
+            <ul class="nav nav-tabs" id="sectionTabs" role="tablist">
+                @for (int i = 0; i < sections.Count; i++)
+                {
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link @(i == 0 ? "active" : "")"
+                        id="section-tab-@sections[i].Id"
+                        data-bs-toggle="tab"
+                        data-bs-target="#section-@sections[i].Id"
+                        type="button"
+                        role="tab"
+                        aria-controls="section-@sections[i].Id"
+                        aria-selected="@(i == 0 ? "true" : "false")">
+                            @sections[i].Name
+                        </button>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <div class="tab-content" id="sectionTabContent">
+            @for (int i = 0; i < sections.Count; i++)
+            {
+                <div class="tab-pane fade @(i == 0 ? "show active" : "")"
+                id="section-@sections[i].Id"
+                role="tabpanel"
+                aria-labelledby="section-tab-@sections[i].Id">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="question-numbers">
+                                @foreach (var question in sections[i].Questions)
+                                {
+                                    <button class="btn mb-2 question-btn"
+                                    data-question-id="@question.Id"
+                                    data-section-id="@sections[i].Id"
+                                    data-description="@question.Description"
+                                    data-has-image="@question.HasImage"
+                                    @* data-image-url="@Url.Content(question.ImageUrl ?? "")" *@
+                                    data-image-url="@question.ImageUrl"
+                                            data-options='@JsonSerializer.Serialize(new {
+                                                Options = new[] {
+                                                    new { Text = question.Option1Text, IsImage = question.IsOption1Image, Image = question.Option1Image },
+                                                    new { Text = question.Option2Text, IsImage = question.IsOption2Image, Image = question.Option2Image },
+                                                    new { Text = question.Option3Text, IsImage = question.IsOption3Image, Image = question.Option3Image },
+                                                    new { Text = question.Option4Text, IsImage = question.IsOption4Image, Image = question.Option4Image },
+                                                    new { Text = question.Option5Text, IsImage = question.IsOption5Image, Image = question.Option5Image }
+                                                },
+                                                CorrectOption = question.CorrectOption
+                                            })'>
+                                        @question.Id
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-md-9">
+                            <div id="questionDetails-@sections[i].Id" class="question-details">
+                                <h5>Select a question to view details</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Submit button wrapper -->
+        <div class="col-12 submit-wrapper mt-4" id="submit-wrapper">
+            <!-- Submit button will be appended by JS -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+       
+               document.addEventListener('DOMContentLoaded', function () {
+                   const selectedQuestions = {};
+
+                   const questionButtons = document.querySelectorAll('.question-btn');
+                   questionButtons.forEach(button => {
+                       button.addEventListener('click', function () {
+                           const questionId = this.getAttribute('data-question-id');
+                           const sectionId = this.getAttribute('data-section-id');
+                           const description = this.getAttribute('data-description');
+                           const hasImage = this.getAttribute('data-has-image') === 'True';
+                           const imageUrl = this.getAttribute('data-image-url');
+                           const optionsData = JSON.parse(this.getAttribute('data-options'));
+                           const questionDetailsContainer = document.getElementById(`questionDetails-${sectionId}`);
+                           
+                           
+                                   questionDetailsContainer.innerHTML = `
+                                               <div class="card shadow-sm">
+                                                   <div class="card-body">
+                                                       <h5 class="card-title">Question</h5>
+                                                       <p class="card-text">${description}</p>
+                                                       
+                                                       ${hasImage ? `<img src="${imageUrl}" class="img-fluid mb-3 rounded" alt="Question Image">` : ''}
+
+                                                       <ul class="list-group mb-3">
+                                                           ${optionsData.Options.map((option, index) => `
+                                                               <li class="list-group-item d-flex align-items-center ${optionsData.CorrectOption === index + 1 ? 'list-group-item-success' : ''}">
+                                                                   <strong class="me-2">${index + 1}.</strong>
+                                                                   ${option.IsImage ? `<img src="${option.Image}" class="img-thumbnail" style="max-height: 100px;" alt="Option Image">` : `<span>${option.Text}</span>`}
+                                                               </li>
+                                                           `).join('')}
+                                                       </ul>
+
+                                                       <div class="d-flex justify-content-end">
+                                                           <button class="btn btn-success me-2 add-to-test-btn" data-question-id="${questionId}" data-section-id="${sectionId}">Add</button>
+                                                           <button class="btn btn-danger remove-from-test-btn d-none" data-question-id="${questionId}" data-section-id="${sectionId}">Remove</button>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                           `;
+
+                           highlightSelectedQuestions(sectionId);
+                       });
+                   });
+
+                   document.addEventListener('click', function (e) {
+                       if (e.target.classList.contains('add-to-test-btn')) {
+                           const questionId = e.target.getAttribute('data-question-id');
+                           const sectionId = e.target.getAttribute('data-section-id');
+
+                           if (!selectedQuestions[sectionId]) selectedQuestions[sectionId] = [];
+
+                           if (!selectedQuestions[sectionId].includes(questionId)) {
+                               selectedQuestions[sectionId].push(questionId);
+                           }
+
+                           e.target.classList.add('d-none');
+                           e.target.nextElementSibling.classList.remove('d-none');
+
+                           highlightSelectedQuestions(sectionId);
+                       }
+
+                       if (e.target.classList.contains('remove-from-test-btn')) {
+                           const questionId = e.target.getAttribute('data-question-id');
+                           const sectionId = e.target.getAttribute('data-section-id');
+
+                           if (selectedQuestions[sectionId]) {
+                               selectedQuestions[sectionId] = selectedQuestions[sectionId].filter(id => id !== questionId);
+                           }
+
+                           e.target.classList.add('d-none');
+                           e.target.previousElementSibling.classList.remove('d-none');
+
+                           highlightSelectedQuestions(sectionId);
+                       }
+                   });
+
+                   function highlightSelectedQuestions(sectionId) {
+                       const buttons = document.querySelectorAll(`.question-btn[data-section-id="${sectionId}"]`);
+                       buttons.forEach(button => {
+                           const questionId = button.getAttribute('data-question-id');
+                           if (selectedQuestions[sectionId] && selectedQuestions[sectionId].includes(questionId)) {
+                               button.classList.add('btn-success');
+                               button.classList.remove('btn-outline-secondary');
+                           } else {
+                               button.classList.remove('btn-success');
+                               button.classList.add('btn-outline-secondary');
+                           }
+                       });
+                   }
+
+                   // Create Skip Button
+                   const skipButton = document.createElement('button');
+                   skipButton.textContent = 'Skip';
+                   skipButton.classList.add('btn', 'btn-secondary', 'me-2');
+                   skipButton.addEventListener('click', function () {
+                       window.location.href = '/Home/Dashboard';
+                   });
+
+                   // Create Submit Button
+                   const submitButton = document.createElement('button');
+                   submitButton.textContent = 'Submit Test';
+                   submitButton.classList.add('btn', 'btn-primary');
+                   submitButton.addEventListener('click', function () {
+                       
+                       const payload = {
+                           TestId : '@tid' ,
+                             selectedQuestions:  Object.values(selectedQuestions)
+                       };
+
+                       fetch('/Test/Save_Test_Questions', {
+                           method: 'POST',
+                           headers: {
+                               'Content-Type': 'application/json',
+                               'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                           },
+                           body: JSON.stringify(payload)
+                       })
+                       .then(response => {
+                           if (response.ok) {
+                               return response.json();
+                           } else {
+                               throw new Error('Failed to submit test');
+                           }
+                       })
+                       .then(data => {
+                     console.log('Response data:', data);
+                           alert('Test submitted successfully!');
+                          
+                           var TestId = data.testId ;
+                            window.location.href = `/Test/Details/${TestId}`;
+                       })
+                       .catch(error => {
+                           console.error('Error:', error);
+                           alert('An error occurred while submitting the test.');
+                       });
+                   });
+
+                   const submitWrapper = document.getElementById('submit-wrapper');
+                   submitWrapper.appendChild(skipButton);
+                   submitWrapper.appendChild(submitButton);
+               }); 
+    </script>
+}

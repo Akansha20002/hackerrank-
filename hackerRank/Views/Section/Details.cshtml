@@ -1,0 +1,133 @@
+@model HackerRank.Models.SectionModel
+
+@{
+    ViewData["Title"] = $"Section: {Model.Name}";
+    
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>@Model.Name</h2>
+        <a asp-action="CreateQuestion" asp-route-sectionId="@Model.Id" class="btn btn-primary">Add New Question</a>
+    </div>
+
+    <div class="questions-container">
+        @foreach (var question in Model.Questions)
+        {
+            <div class="question-card mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="question-number">Question #@(Model.Questions.ToList().IndexOf(question) + 1)</span>
+                        <div class="question-actions">
+                            <a asp-action="EditQuestion" asp-route-id="@question.Id" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+                            <form asp-action="DeleteQuestion" asp-route-id="@question.Id" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                        onclick="return confirm('Are you sure you want to delete this question?')">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="question-content mb-4">
+                            <h5 class="question-text mb-3">@question.Description</h5>
+                            @if (question.HasImage)
+                            {
+                                <div class="question-image-container mb-3">
+                                    <img src="@question.ImageUrl" class="img-fluid question-image" alt="Question Image">
+                                </div>
+                            }
+                        </div>
+
+                        <div class="options-list">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                var optionText = typeof(QuestionModel).GetProperty($"Option{i}Text").GetValue(question) as string;
+                                var isImage = (bool)typeof(QuestionModel).GetProperty($"IsOption{i}Image").GetValue(question);
+                                var optionImage = typeof(QuestionModel).GetProperty($"Option{i}Image").GetValue(question) as string;
+
+                                <div class="option @(question.CorrectOption == i ? "correct-answer" : "")">
+                                    <div class="d-flex align-items-start">
+                                        <span class="option-number">@i.</span>
+                                        <div class="option-content">
+                                            @if (isImage)
+                                            {
+                                                <img src="@optionImage" class="option-image" alt="Option @i">
+                                            }
+                                            else
+                                            {
+                                                <span class="option-text">@optionText</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .questions-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .question-card {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .question-number {
+        font-weight: 500;
+        color: #666;
+    }
+    .question-text {
+        color: #333;
+        font-size: 1.1rem;
+    }
+    .question-image-container {
+        text-align: center;
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 4px;
+    }
+    .question-image {
+        max-height: 300px;
+        object-fit: contain;
+    }
+    .options-list {
+        margin-top: 1rem;
+    }
+    .option {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+    }
+    .correct-answer {
+        border-left: 4px solid #28a745;
+        background-color: #f0fff4;
+    }
+    .option-number {
+        font-weight: bold;
+        margin-right: 1rem;
+        min-width: 25px;
+    }
+    .option-content {
+        flex: 1;
+    }
+    .option-image {
+        max-height: 100px;
+        margin-top: 0.5rem;
+        border-radius: 4px;
+    }
+    .option-text {
+        color: #495057;
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    }
+</style>

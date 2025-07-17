@@ -1,0 +1,306 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model HackerRank.Models.TestModel
+
+@{
+    ViewData["Title"] = $"Test: {Model.TestName}";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>@Model.TestName</h2>
+        <div class="d-flex justify-content-end gap-2">
+         
+            
+            <!-- Add Delete button -->
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline"
+                  onsubmit="return confirm('Are you sure you want to delete this test? This action cannot be undone.');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger">Delete Test</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p class="mb-2"><strong>Test Date:</strong></p>
+                    <p>@Model.TestDate.ToString("MMMM dd, yyyy")</p>
+                </div>
+                <div class="col-md-4">
+                    <p class="mb-2"><strong>Duration:</strong></p>
+                    <p>@Model.TimeAllowed minutes</p>
+                </div>
+                <div class="col-md-4">
+                    <p class="mb-2"><strong>Total Questions:</strong></p>
+                    <p>@(Model.TestQuestions?.Count ?? 0)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="questions-container">
+        @if (Model.TestQuestions != null && Model.TestQuestions.Any())
+        {
+            var groupedQuestions = Model.TestQuestions.GroupBy(tq => tq.Question.SectionId);
+            foreach (var group in groupedQuestions)
+            {
+                <div class="section-group mb-5">
+                    <h4 class="section-title mb-3">Section: @group.First().Question.Section.Name</h4>
+                    @foreach (var testQuestion in group)
+                    {
+                        var question = testQuestion.Question;
+                        <div class="question-card mb-4">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span class="question-number">Question #@(Model.TestQuestions.ToList().IndexOf(testQuestion) + 1)</span>
+                                    <div class="question-actions">
+                                        <form asp-action="RemoveQuestion" asp-route-testId="@Model.Id" asp-route-questionId="@question.Id" 
+                                              method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="return confirm('Are you sure you want to remove this question from the test?')">
+                                                Remove
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="question-content mb-4">
+                                        <h5 class="question-text mb-3">@question.Description</h5>
+                                        @if (question.HasImage)
+                                        {
+                                            <div class="question-image-container mb-3">
+                                                <img src="@question.ImageUrl" class="img-fluid question-image" alt="Question Image">
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <div class="options-list">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            var optionText = typeof(QuestionModel).GetProperty($"Option{i}Text").GetValue(question) as string;
+                                            var isImage = (bool)typeof(QuestionModel).GetProperty($"IsOption{i}Image").GetValue(question);
+                                            var optionImage = typeof(QuestionModel).GetProperty($"Option{i}Image").GetValue(question) as string;
+
+                                            <div class="option @(question.CorrectOption == i ? "correct-answer" : "")">
+                                                <div class="d-flex align-items-start">
+                                                    <span class="option-number">@i.</span>
+                                                    <div class="option-content">
+                                                        @if (isImage)
+                                                        {
+                                                            <img src="@optionImage" class="option-image" alt="Option @i">
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="option-text">@optionText</span>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">
+                No questions have been added to this test yet.
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .questions-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .question-card {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .question-number {
+        font-weight: 500;
+        color: #666;
+    }
+    .question-text {
+        color: #333;
+        font-size: 1.1rem;
+    }
+    .question-image-container {
+        text-align: center;
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 4px;
+    }
+    .question-image {
+        max-height: 300px;
+        object-fit: contain;
+    }
+    .options-list {
+        margin-top: 1rem;
+    }
+    .option {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+    }
+    .correct-answer {
+        border-left: 4px solid #28a745;
+        background-color: #f0fff4;
+    }
+    .option-number {
+        font-weight: bold;
+        margin-right: 1rem;
+        min-width: 25px;
+    }
+    .option-content {
+        flex: 1;
+    }
+    .option-image {
+        max-height: 100px;
+        margin-top: 0.5rem;
+        border-radius: 4px;
+    }
+    .option-text {
+        color: #495057;
+    }
+    .section-group {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .section-title {
+        color: #1ba94c;
+        font-size: 1.3rem;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+</style>
+
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sectionSelect = document.getElementById('sectionSelect');
+            const questionsContainer = document.getElementById('questionsContainer');
+            const addQuestionForm = document.getElementById('addQuestionForm');
+
+            // Load sections when modal opens
+            $('#addQuestionModal').on('show.bs.modal', async function() {
+                try {
+                    const response = await fetch('/Section/GetSections');
+                    const sections = await response.json();
+                    
+                    sectionSelect.innerHTML = '<option value="">Choose a section...</option>';
+                    sections.forEach(section => {
+                        sectionSelect.innerHTML += `<option value="${section.id}">${section.name}</option>`;
+                    });
+                } catch (error) {
+                    console.error('Error loading sections:', error);
+                }
+            });
+
+            // Load questions when section is selected
+            sectionSelect.addEventListener('change', async function() {
+                const sectionId = this.value;
+                if (!sectionId) {
+                    questionsContainer.innerHTML = '';
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/Section/GetQuestions/' + sectionId);
+                    const questions = await response.json();
+                    
+                    questionsContainer.innerHTML = questions.map(question => {
+                        let questionDisplay = `
+                            <div class="list-group-item">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="questionIds" value="${question.id}" id="question${question.id}">
+                                    <label class="form-check-label" for="question${question.id}">
+                                        <div class="question-content">
+                                            <p>${question.description}</p>`;
+                        
+                        if (question.hasImage) {
+                            questionDisplay += `
+                                <div class="question-image-container">
+                                    <img src="${question.imageUrl}" class="img-fluid question-image" alt="Question Image">
+                                </div>`;
+                        }
+
+                        questionDisplay += `<div class="options-list">`;
+                        question.options.forEach((option, index) => {
+                            questionDisplay += `
+                                <div class="option ${question.correctOption === index + 1 ? 'correct-answer' : ''}">
+                                    <div class="d-flex align-items-start">
+                                        <span class="option-number">${index + 1}.</span>
+                                        <div class="option-content">`;
+                            
+                            if (option.isImage) {
+                                questionDisplay += `<img src="${option.image}" class="option-image" alt="Option ${index + 1}">`;
+                            } else {
+                                questionDisplay += `<span class="option-text">${option.text}</span>`;
+                            }
+
+                            questionDisplay += `
+                                        </div>
+                                    </div>
+                                </div>`;
+                        });
+
+                        questionDisplay += `
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>`;
+                        
+                        return questionDisplay;
+                    }).join('');
+                } catch (error) {
+                    console.error('Error loading questions:', error);
+                }
+            });
+
+            // Handle form submission
+            addQuestionForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                try {
+                    const response = await fetch('/Test/AddQuestion', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify(Object.fromEntries(formData))
+                    });
+
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Failed to add questions to the test.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while adding questions.');
+                }
+            });
+        });
+    </script>
+}
+
+

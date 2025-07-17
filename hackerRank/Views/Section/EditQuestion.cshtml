@@ -1,0 +1,141 @@
+@model HackerRank.Models.QuestionModel
+
+@{
+    ViewData["Title"] = "Edit Question";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Edit Question</h3>
+                    <form asp-action="EditQuestion" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="SectionId" />
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Question Text</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Question Image</label>
+                            @if (Model.HasImage)
+                            {
+                                <div class="mb-2">
+                                    <img src="@Model.ImageUrl" class="img-fluid img-preview" alt="Current Question Image" />
+                                </div>
+                            }
+                            <input type="file" name="questionImage" class="form-control" accept="image/*" />
+                            <small class="text-muted">Upload a new image to replace the current one (if any)</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="AnswerControlType" class="form-label">Answer Type</label>
+                            <select asp-for="AnswerControlType" class="form-select">
+                                <option value="Radio">Single Choice (Radio)</option>
+                                <option value="Checkbox">Multiple Choice (Checkbox)</option>
+                            </select>
+                        </div>
+
+                        <div class="options-container">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                var optionText = typeof(QuestionModel).GetProperty($"Option{i}Text").GetValue(Model) as string;
+                                var isImage = (bool)typeof(QuestionModel).GetProperty($"IsOption{i}Image").GetValue(Model);
+                                var optionImage = typeof(QuestionModel).GetProperty($"Option{i}Image").GetValue(Model) as string;
+
+                                <div class="option-group mb-4">
+                                    <h5>Option @i</h5>
+                                    <div class="mb-2">
+                                        <label class="form-label">Text</label>
+                                        <input type="text" name="@($"Option{i}Text")" value="@optionText" class="form-control" required />
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Image</label>
+                                        @if (isImage)
+                                        {
+                                            <div class="mb-2">
+                                                <img src="@optionImage" class="img-fluid img-preview" alt="Current Option @i Image" />
+                                            </div>
+                                        }
+                                        <input type="file" name="optionImages" class="form-control" accept="image/*" />
+                                        <small class="text-muted">Upload a new image to replace the current one (if any)</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="CorrectOption" class="form-label">Correct Option Number</label>
+                            <input asp-for="CorrectOption" class="form-control" type="number" min="1" max="5" required />
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <a asp-action="Details" asp-route-id="@Model.SectionId" class="btn btn-outline-secondary">Back to Section</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Preview images when selected
+        function previewImage(input, previewElement) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    previewElement.src = e.target.result;
+                    previewElement.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Initialize file input handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            const questionImageInput = document.querySelector('input[name="questionImage"]');
+            const optionImageInputs = document.querySelectorAll('input[name="optionImages"]');
+
+            if (questionImageInput) {
+                const preview = document.createElement('img');
+                preview.className = 'img-preview mt-2 img-fluid';
+                preview.style.display = 'none';
+                questionImageInput.parentNode.appendChild(preview);
+
+                questionImageInput.addEventListener('change', function() {
+                    previewImage(this, preview);
+                });
+            }
+
+            optionImageInputs.forEach(input => {
+                const preview = document.createElement('img');
+                preview.className = 'img-preview mt-2 img-fluid';
+                preview.style.display = 'none';
+                input.parentNode.appendChild(preview);
+
+                input.addEventListener('change', function() {
+                    previewImage(this, preview);
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .img-preview {
+            max-height: 200px;
+            margin-top: 10px;
+        }
+        .option-group {
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+        }
+    </style>
+}

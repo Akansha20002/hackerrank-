@@ -1,0 +1,22 @@
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+
+<div class="col-md-3 col-lg-2 p-3 bg-light">
+    <h4>Dashboard</h4>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Home" && currentAction == "Dashboard" ? "active" : "")" 
+               asp-controller="Home" asp-action="Dashboard">
+                <i class="bi bi-card-checklist"></i> Tests
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentController == "Section" ? "active" : "")" 
+               asp-controller="Section" asp-action="Index">
+                <i class="bi bi-stickies"></i> Sections
+            </a>
+        </li>
+    </ul>
+</div>

@@ -1,0 +1,27 @@
+﻿<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card" style="width: 25rem;">
+        <div class="card-body">
+            <h5 class="card-title text-center">Admin Login</h5>
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @TempData["Error"]
+                </div>
+            }
+            <form action="/home/login" method="POST">
+                <!-- Username Field -->
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <!-- Password Field -->
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="passwordHash" required>
+                </div>
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+        </div>
+    </div>
+</div>

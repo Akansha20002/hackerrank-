@@ -1,0 +1,133 @@
+html {
+  font-size: 14px;
+  position: relative;
+  min-height: 100%;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+body {
+  margin-bottom: 60px;
+  color: #3c4043;
+  line-height: 1.6;
+}
+
+/* Input styles */
+.form-control {
+  border-radius: 4px;
+  border: 1px solid #dde1e4;
+  padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+  border-color: #1ba94c;
+  box-shadow: 0 0 0 0.2rem rgba(27, 169, 76, 0.25);
+}
+
+/* Button styles */
+.btn {
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.btn-lg {
+  padding: 0.75rem 2rem;
+}
+
+/* Card styles */
+.card {
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Animation utilities */
+.hover-lift {
+  transition: transform 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1ba94c;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #158f3e;
+}
+
+/* Container padding adjustments */
+.container {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 992px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Shadow utilities */
+.shadow-sm {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.shadow {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.shadow-lg {
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+/* Dashboard Sidebar Styles */
+.nav-link.active {
+    background-color: var(--primary-color);
+    color: white !important;
+    border-radius: 4px;
+}
+
+.nav-link:hover {
+    background-color: #f0f0f0;
+    border-radius: 4px;
+}
+
+.nav-link.active:hover {
+    background-color: var(--primary-color);
+}

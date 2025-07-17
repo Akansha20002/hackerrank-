@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<style>
+    .hero-section {
+        padding: 6rem 0;
+        background: linear-gradient(135deg, #0c141c 0%, #1e2a35 100%);
+        color: white;
+        text-align: center;
+    }
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+    .hero-subtitle {
+        font-size: 1.5rem;
+        color: #a3b3c2;
+        margin-bottom: 2rem;
+    }
+    .features-section {
+        padding: 5rem 0;
+        background: #ffffff;
+    }
+    .feature-card {
+        padding: 2rem;
+        border-radius: 8px;
+        background: #f8f9fa;
+        margin-bottom: 2rem;
+        transition: transform 0.3s ease;
+    }
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+    .feature-icon {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+    .feature-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .cta-section {
+        padding: 4rem 0;
+        background-color: #f0f3f7;
+        text-align: center;
+    }
+</style>
+
+<div class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">Practice & Perfect Your Coding Skills</h1>
+        <p class="hero-subtitle">Join millions of developers to solve coding challenges and prepare for interviews</p>
+        <a href="/home/signup" class="btn btn-primary btn-lg">Get Started</a>
+    </div>
+</div>
+
+<div class="features-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-code-square"></i>
+                    </div>
+                    <h3 class="feature-title">Practice Coding</h3>
+                    <p>Solve challenges in different programming languages and improve your skills.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-trophy"></i>
+                    </div>
+                    <h3 class="feature-title">Compete & Learn</h3>
+                    <p>Participate in coding contests and learn from other developers.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                    <h3 class="feature-title">Prepare for Interviews</h3>
+                    <p>Get ready for technical interviews with our comprehensive preparation tools.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <div class="container">
+        <h2>Ready to Start Your Coding Journey?</h2>
+        <p class="mb-4">Join our community of developers and start practicing today</p>
+        <a href="/home/signup" class="btn btn-primary btn-lg mx-2">Sign Up Now</a>
+        <a href="/home/login" class="btn btn-outline-primary btn-lg mx-2">Already have an account?</a>
+    </div>
+</div>

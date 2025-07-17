@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackerRank", "HackerRank.csproj", "{1AC3672E-4B83-100D-F8ED-4DECABAB0E8C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackerRank.Tests", "..\HackerRank.Tests\HackerRank.Tests.csproj", "{FBA42BFC-F2B6-456D-8760-D232635E6671}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1AC3672E-4B83-100D-F8ED-4DECABAB0E8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AC3672E-4B83-100D-F8ED-4DECABAB0E8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AC3672E-4B83-100D-F8ED-4DECABAB0E8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AC3672E-4B83-100D-F8ED-4DECABAB0E8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBA42BFC-F2B6-456D-8760-D232635E6671}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBA42BFC-F2B6-456D-8760-D232635E6671}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBA42BFC-F2B6-456D-8760-D232635E6671}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBA42BFC-F2B6-456D-8760-D232635E6671}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DB34A516-A834-4CDD-B737-2E087DFBB411}
+	EndGlobalSection
+EndGlobal
