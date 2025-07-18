@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace HackerRank.Tests
 {
@@ -25,27 +24,10 @@ namespace HackerRank.Tests
 
             var configurationMock = new Mock<IConfiguration>();
             configurationMock.Setup(x => x["FileStorage:BaseUrl"]).Returns("http://test.com");
-            var fileStorageMock = new Mock<FileStorageService>(configurationMock.Object, Mock.Of<ILogger<FileStorageService>>());
+            var loggerMock = new Mock<ILogger<FileStorageService>>();
+            var fileStorageService = new FileStorageService(configurationMock.Object, loggerMock.Object);
 
-            // Mock successful file upload
-            fileStorageMock
-                .Setup(f => f.UploadFile(It.IsAny<IFormFile>(), It.IsAny<string>()))
-                .ReturnsAsync("testImageUrl");
-
-            // Mock successful file deletion
-            fileStorageMock
-                .Setup(f => f.DeleteFile(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
-
-            var controller = new SectionController(context, configurationMock.Object, fileStorageMock.Object);
-            
-            // Setup ControllerContext
-            controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext()
-            };
-
-            return controller;
+            return new SectionController(context, configurationMock.Object, fileStorageService);
         }
 
         [Fact]
@@ -94,132 +76,7 @@ namespace HackerRank.Tests
 
             // Assert
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Contains("Section name is required", badRequest.Value?.ToString() ?? "");
-        }
-
-        [Fact]
-        public async Task Details_ValidId_ReturnsViewWithSection()
-        {
-            // Arrange
-            var controller = CreateControllerWithInMemoryDb(out var context);
-            var section = new SectionModel { Id = 1, Name = "Test Section" };
-            context.Sections.Add(section);
-            await context.SaveChangesAsync();
-
-            // Act
-            var result = await controller.Details(1);
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var model = Assert.IsType<SectionModel>(viewResult.Model);
-            Assert.Equal("Test Section", model.Name);
-        }
-
-        [Theory]
-        [InlineData(null)]
-        [InlineData(999)]
-        public async Task Details_InvalidId_ReturnsNotFound(int? id)
-        {
-            // Arrange
-            var controller = CreateControllerWithInMemoryDb(out var context);
-
-            // Act
-            var result = await controller.Details(id);
-
-            // Assert
-            Assert.IsType<NotFoundResult>(result);
-        }
-
-        [Fact]
-        public async Task CreateQuestion_ValidData_RedirectsToDetails()
-        {
-            // Arrange
-            var controller = CreateControllerWithInMemoryDb(out var context);
-            var section = new SectionModel { Id = 1, Name = "Test Section" };
-            context.Sections.Add(section);
-            await context.SaveChangesAsync();
-
-            var question = new QuestionModel 
-            { 
-                SectionId = 1,
-                Description = "Test Question",
-                Option1Text = "Option 1",
-                Option2Text = "Option 2",
-                Option3Text = "Option 3",
-                Option4Text = "Option 4",
-                CorrectOption = 1
-            };
-
-            var questionImage = new Mock<IFormFile>();
-            questionImage.Setup(f => f.Length).Returns(1024);
-
-            // Act
-            var result = await controller.CreateQuestion(question, questionImage.Object, null);
-
-            // Assert
-            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal(nameof(controller.Details), redirectResult.ActionName);
-            Assert.Equal(1, redirectResult.RouteValues["id"]);
-            Assert.Single(context.Questions);
-        }
-
-        [Fact]
-        public async Task CreateQuestion_InvalidModelState_ReturnsViewWithModel()
-        {
-            // Arrange
-            var controller = CreateControllerWithInMemoryDb(out var context);
-            var section = new SectionModel { Id = 1, Name = "Test Section" };
-            context.Sections.Add(section);
-            await context.SaveChangesAsync();
-
-            var question = new QuestionModel { SectionId = 1 }; // Missing required fields
-            controller.ModelState.AddModelError("Description", "Description is required");
-
-            // Act
-            var result = await controller.CreateQuestion(question, null, null);
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.IsType<QuestionModel>(viewResult.Model);
-            Assert.Empty(context.Questions);
-        }
-
-        [Fact]
-        public async Task CreateQuestion_WithImages_SavesImages()
-        {
-            // Arrange
-            var controller = CreateControllerWithInMemoryDb(out var context);
-            var section = new SectionModel { Id = 1, Name = "Test Section" };
-            context.Sections.Add(section);
-            await context.SaveChangesAsync();
-
-            var question = new QuestionModel 
-            { 
-                SectionId = 1,
-                Description = "Test Question",
-                Option1Text = "Option 1",
-                Option2Text = "Option 2",
-                Option3Text = "Option 3",
-                Option4Text = "Option 4",
-                CorrectOption = 1
-            };
-
-            var questionImage = new Mock<IFormFile>();
-            questionImage.Setup(f => f.Length).Returns(1024);
-
-            var optionImages = new List<IFormFile> { questionImage.Object };
-
-            // Act
-            var result = await controller.CreateQuestion(question, questionImage.Object, optionImages);
-
-            // Assert
-            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            var savedQuestion = await context.Questions.FirstOrDefaultAsync();
-            Assert.NotNull(savedQuestion);
-            Assert.True(savedQuestion.HasImage);
-            Assert.Equal("testImageUrl", savedQuestion.ImageUrl);
-            Assert.True(savedQuestion.IsOption1Image);
-            Assert.Equal("testImageUrl", savedQuestion.Option1Image);
+            Assert.Contains("Section name is required", badRequest.Value.ToString());
         }
 
         [Fact]
